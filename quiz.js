@@ -1,4 +1,5 @@
 "use strict";
+
 angular.module('nampnq.util.bindHtml', [])
     .directive('bindHtmlUnsafe', function() {
         return function(scope, element, attr) {
@@ -8,14 +9,18 @@ angular.module('nampnq.util.bindHtml', [])
             });
         };
     });
+
 angular.module("info.vietnamcode.nampnq.videogular.plugins.quiz", ['nampnq.util.bindHtml'])
     .directive(
-        "vgQuiz", ["VG_EVENTS",
-            function(VG_EVENTS) {
+    // CAMBIO A VG_STATES?
+        "vgQuiz", ["VG_STATES",
+            function(VG_STATES) {
                 return {
                     restrict: "E",
+                    // Require adds a new parameter in our link function.
+                    // That parameter is in fact Videogular’s API, a directive controller with all the methods and properties available to control your video player
                     require: "^videogular",
-                    templateUrl: "views/videogular/plugins/quiz/quiz.html",
+                    //templateUrl: "views/videogular/plugins/quiz/quiz.html",
                     scope: {
                         vgData: "=",
                         vgQuizSubmit: '&',
@@ -24,6 +29,7 @@ angular.module("info.vietnamcode.nampnq.videogular.plugins.quiz", ['nampnq.util.
                         vgQuizShowExplanation: '&'
                     },
                     link: function(scope, elem, attr, API) {
+                        scope.API = API;
                         scope.previous_time = 0;
                         scope.submit = true;
                         scope.skip = true;
@@ -36,7 +42,7 @@ angular.module("info.vietnamcode.nampnq.videogular.plugins.quiz", ['nampnq.util.
 
                         function onUpdateTime(target, params) {
                             if (scope.vgData)
-                                if (!API.videoElement[0].paused) {
+                                if (!API.videogularElement[0].firstChild.paused) {
                                     var i, cue_point_time, triggered_cue_points, currentTime = params[0],
                                         timeDelta = currentTime - scope.previous_time;
                                     if (timeDelta > 0 && 2 > timeDelta) {
@@ -58,7 +64,7 @@ angular.module("info.vietnamcode.nampnq.videogular.plugins.quiz", ['nampnq.util.
                                                 elem.css("background", "transparent");
                                         }
                                     }
-                                    scope.previous_time = currentTime
+                                    scope.previous_time = currentTime;
                                 }
                         };
 
@@ -119,10 +125,8 @@ angular.module("info.vietnamcode.nampnq.videogular.plugins.quiz", ['nampnq.util.
                             }
                         };
                         elem.css('display', 'none');
-                        API.$on(VG_EVENTS.ON_UPDATE_TIME, onUpdateTime);
-                        API.$on(VG_EVENTS.ON_UPDATE_SIZE, onUpdateSize);
-
                     }
                 }
             }
         ]);
+// ver https://gist.github.com/steadystatic/82b11548494965779347
